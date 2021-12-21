@@ -1,0 +1,8 @@
+cmake-build-debug/
+bin/
+.idea/.name
+.idea/assignment3-server.iml
+.idea/assignment3-spl-server.iml
+.idea/misc.xml
+.idea/modules.xml
+.idea/vcs.xml
