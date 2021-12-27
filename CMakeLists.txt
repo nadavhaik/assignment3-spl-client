@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-project(assignment3_server)
+project(assignment3-spl-server)
 
 set(CMAKE_CXX_STANDARD 14)
 
