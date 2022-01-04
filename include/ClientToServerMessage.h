@@ -21,7 +21,7 @@ enum cts_message_type {
 class ClientToServerMessage{
 public:
     ClientToServerMessage(cts_message_type type);
-    virtual char* encode()=0;
+    virtual vector<char> encode()=0;
 };
 
 #endif //ASSIGNMENT3_SPL_CLIENT_CLIENTTOSERVERMESSAGE_H
