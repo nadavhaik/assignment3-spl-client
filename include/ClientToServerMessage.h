@@ -47,7 +47,7 @@ private:
 
 class LogoutMessage : public ClientToServerMessage {
 public:
-    LoginMessage(vector<char> &message, string userName);
+    LogoutMessage(const vector<char> &message, string userName);
     vector<char> encode();
 };
 
