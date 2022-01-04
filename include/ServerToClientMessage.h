@@ -20,9 +20,10 @@ class ServerToClientMessage {
 public:
     explicit ServerToClientMessage(stc_message_type type, vector<char> bytes);
     virtual std::string toString()=0;
+    int getType();
 protected:
     vector<char> bytes;
-    stc_message_type type;
+    stc_message_type notificationType;
 };
 
 class NotificationMessage : public ServerToClientMessage {

@@ -6,7 +6,11 @@
 #include "Casters.cpp"
 
 
-ServerToClientMessage::ServerToClientMessage(stc_message_type type, vector<char> bytes): type(type), bytes(bytes) {}
+ServerToClientMessage::ServerToClientMessage(stc_message_type type, vector<char> bytes): notificationType(type), bytes(bytes) {}
+
+int ServerToClientMessage::getType() {
+    return notificationType;
+}
 
 
 NotificationMessage::NotificationMessage(const vector<char> &bytes)
