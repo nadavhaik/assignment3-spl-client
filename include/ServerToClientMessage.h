@@ -36,5 +36,25 @@ private:
     std::string content;
 };
 
+class AckMessage : public ServerToClientMessage {
+public:
+    explicit AckMessage(const vector<char> &bytes);
+    void decode();
+    std::string toString() override;
+private:
+    short messageOP;
+};
+
+class ErrorMessage : public ServerToClientMessage {
+public:
+    explicit ErrorMessage(const vector<char> &bytes);
+    void decode();
+    std::string toString() override;
+private:
+    short messageOP{};
+};
+
+
+
 
 #endif //ASSIGNMENT3_SPL_CLIENT_SERVERTOCLIENTMESSAGE_H
