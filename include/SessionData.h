@@ -12,14 +12,16 @@ using namespace std;
 class SessionData {
 public:
     SessionData(string ip, short port);
+    ~SessionData();
     void run();
+    ServerToClientMessage *communicate(const ClientToServerMessage &message);
+    bool isLoggedIn();
+    bool getShouldStop();
 private:
     ConnectionHandler ch;
     bool loggedIn = false;
     bool shouldStop = false;
     mutex connectionLock;
-    void fetchNotifications();
-    ServerToClientMessage *communicate(const ClientToServerMessage &message);
 };
 
 
