@@ -9,6 +9,6 @@ add_executable(
         include/ConnectionHandler.h
         src/ConnectionHandler.cpp
         src/Casters.cpp
-        include/ClientToServerMessage.h
+        include/ClientToServerMessage.h src/ClientToServerMessage.cpp
         include/ServerToClientMessage.h src/ServerToClientMessage.cpp include/SessionData.h src/SessionData.cpp)
 

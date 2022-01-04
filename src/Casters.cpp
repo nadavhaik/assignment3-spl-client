@@ -22,7 +22,7 @@ short byteVectorToShort(vector<char> vectorList) {
     return res;
 }
 
-vector<char> shortToBytesList(short num) {
+vector<char> shortToBytesVector(short num) {
     vector<char> v;
     v.push_back(((num >> 8) & 0xFF));
     v.push_back((num & 0xFF));
