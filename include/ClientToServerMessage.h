@@ -22,7 +22,7 @@ enum cts_message_type {
 class ClientToServerMessage{
 public:
     ClientToServerMessage(cts_message_type type, string command);
-    virtual const vector<char> encode()=0;
+    virtual vector<char> encode() const=0;
 private:
     cts_message_type type;
     string command;
@@ -31,7 +31,7 @@ private:
 class RegisterMessage : public ClientToServerMessage {
 public:
     explicit RegisterMessage(const string &command);
-    const vector<char> encode();
+    vector<char> encode() const override;
 private:
     string username;
     string password;
@@ -41,7 +41,7 @@ private:
 class LoginMessage : public ClientToServerMessage {
 public:
     LoginMessage(const string &command);
-    const vector<char> encode();
+    vector<char> encode() const override;
 private:
     string username;
     string password;
@@ -51,13 +51,13 @@ private:
 class LogoutMessage : public ClientToServerMessage {
 public:
     LogoutMessage(const string &command, string userName);
-    const vector<char> encode();
+    vector<char> encode() const override;
 };
 
 class FollowOrUnfollowMessage : public ClientToServerMessage {
 public:
     FollowOrUnfollowMessage(const string &command, string userName);
-    const vector<char> encode();
+    vector<char> encode() const override;
 private:
     bool follow;
     string otherUserName;
@@ -66,7 +66,7 @@ private:
 class PostMessage : public ClientToServerMessage {
 public:
     PostMessage(const string &command, string userName);
-    const vector<char> encode();
+    vector<char> encode() const override;
 private:
     string content;
 
@@ -75,7 +75,7 @@ private:
 class PMMessage : public ClientToServerMessage {
 public:
     PMMessage(const string &command, string userName);
-    const vector<char> encode();
+    vector<char> encode() const override;
 private:
     string content;
     string sendingTimeAndDate;
@@ -85,13 +85,13 @@ private:
 class LoggedInStates : public ClientToServerMessage {
 public:
     LoggedInStates(const string &command, string userName);
-    const vector<char> encode();
+    vector<char> encode() const override;
 };
 
 class StatisticsMessage : public ClientToServerMessage {
 public:
     StatisticsMessage(const string &command, string userName);
-    const vector<char> encode();
+    vector<char> encode() const override;
 private:
     vector<string> userNamesList;
 };
@@ -99,7 +99,7 @@ private:
 class BlockMessage : public ClientToServerMessage {
 public:
     BlockMessage(const string &command, string userName);
-    const vector<char> encode();
+    vector<char> encode() const override;
 private:
     string otherUserName;
 };
@@ -107,7 +107,7 @@ private:
 class FetchNotificationMessage : public ClientToServerMessage {
 public:
     FetchNotificationMessage(const string &command, string userName);
-    const vector<char> encode();
+    vector<char> encode() const override;
 
 };
 
