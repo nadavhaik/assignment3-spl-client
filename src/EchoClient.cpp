@@ -4,6 +4,7 @@
 #include "../include/ClientToServerMessage.h"
 #include "../include/ServerToClientMessage.h"
 #include "Casters.cpp"
+#include "../include/SessionData.h"
 
 
 /**
@@ -36,6 +37,8 @@ int main (int argc, char *argv[]) {
 
     std::string host = argv[1];
     short port = atoi(argv[2]);
+    SessionData s(host, port);
+
 
     ConnectionHandler connectionHandler(host, port);
     if (!connectionHandler.connect()) {

@@ -1,5 +1,8 @@
 #include <string>
+#include <mutex>
 #include "ConnectionHandler.h"
+#include "ClientToServerMessage.h"
+#include "ServerToClientMessage.h"
 using namespace std;
 
 
@@ -8,12 +11,15 @@ using namespace std;
 
 class SessionData {
 public:
-    SessionData(string ip, string port);
+    SessionData(string ip, short port);
     void run();
 private:
     ConnectionHandler ch;
     bool loggedIn = false;
     bool shouldStop = false;
+    mutex connectionLock;
+    void fetchNotifications();
+    ServerToClientMessage *communicate(const ClientToServerMessage &message);
 };
 
 
