@@ -28,7 +28,7 @@ void NotificationMessage::decode() {
     }
     author = s;
 
-    i = 3;
+    i++;
     byte = bytes[i];
     s = "";
     while(byte != '\0') {
