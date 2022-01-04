@@ -22,7 +22,9 @@ enum cts_message_type {
 class ClientToServerMessage{
 public:
     ClientToServerMessage(cts_message_type type, string command);
+    ~ClientToServerMessage()=default;
     virtual vector<char> encode()=0;
+    int getType();
 private:
     cts_message_type type;
 protected:

@@ -19,6 +19,7 @@ enum notification_type {
 class ServerToClientMessage {
 public:
     explicit ServerToClientMessage(stc_message_type type, vector<char> bytes);
+    ~ServerToClientMessage()=default;
     virtual std::string toString()=0;
     int getType();
 protected:

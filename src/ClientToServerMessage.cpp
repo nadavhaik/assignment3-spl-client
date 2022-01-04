@@ -9,6 +9,10 @@ using namespace std;
 
 ClientToServerMessage::ClientToServerMessage(cts_message_type type, string command): type(type), command(command) {}
 
+int ClientToServerMessage::getType() {
+    return type;
+}
+
 RegisterMessage::RegisterMessage(const string &command)
     : ClientToServerMessage(REGISTER, command) {}
 

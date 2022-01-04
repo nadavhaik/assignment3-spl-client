@@ -77,28 +77,21 @@ void SessionData::run() {
 
         ServerToClientMessage *response = communicate(*message);
         cout << response->toString() << endl;
-
-
-
-
-
-
+        if(message->getType() == 2 && response->getType() == 10) // LOGIN + ACK
+            loggedIn = true;
+        if(message->getType() == 3 && response->getType() == 10) { // LOGOUT + ACK
+            loggedIn = false;
+            shouldStop = true;
+        }
         delete message;
         delete response;
-
-        shouldStop = true;
     }
-
-
-
-
-
 
     t.join();
 
 }
 
-ServerToClientMessage *SessionData::communicate(const ClientToServerMessage &message) {
+ServerToClientMessage *SessionData::communicate(ClientToServerMessage &message) {
     connectionLock.lock();
     vector<char> bytesVec = message.encode();
     char *bytes = toBytesMessage(bytesVec);

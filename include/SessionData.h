@@ -14,7 +14,7 @@ public:
     SessionData(string ip, short port);
     ~SessionData();
     void run();
-    ServerToClientMessage *communicate(const ClientToServerMessage &message);
+    ServerToClientMessage *communicate(ClientToServerMessage &message);
     bool isLoggedIn();
     bool getShouldStop();
 private:
