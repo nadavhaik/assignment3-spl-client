@@ -3,4 +3,11 @@ project(assignment3-spl-client)
 
 set(CMAKE_CXX_STANDARD 11)
 
-add_executable(assignment3_server src/EchoClient.cpp include/ConnectionHandler.h src/ConnectionHandler.cpp src/Casters.cpp)
+add_executable(
+        assignment3-spl-client
+        src/EchoClient.cpp
+        include/ConnectionHandler.h
+        src/ConnectionHandler.cpp
+        src/Casters.cpp
+        include/ClientToServerMessage.h
+        include/ServerToClientMessage.h src/ServerToClientMessage.cpp)

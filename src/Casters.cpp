@@ -1,5 +1,6 @@
-short bytesToShort(char* bytesArr)
-{
+using namespace std;
+
+short bytesToShort(char* bytesArr){
     short result = (short)((bytesArr[0] & 0xff) << 8);
     result += (short)(bytesArr[1] & 0xff);
     return result;
