@@ -2,6 +2,8 @@
 
 #include "../include/connectionHandler.h"
 #include "../include/ClientToServerMessage.h"
+#include "../include/ServerToClientMessage.h"
+#include "Casters.cpp"
 
 
 /**
@@ -9,6 +11,22 @@
 * This code assumes that the server replies the exact text the client sent it (as opposed to the practical session example)
 
 */
+
+ServerToClientMessage *parseMessage(const vector<char> &bytes) {
+    vector<char> opBytes = {bytes[0], bytes[1]};
+    short opCode = byteVectorToShort(opBytes);
+    switch(opCode) {
+        case 9:
+            return new NotificationMessage(bytes);
+        case 10:
+            return new AckMessage(bytes);
+        case 11:
+            return new ErrorMessage(bytes);
+    }
+
+    return nullptr;
+
+}
 
 int main (int argc, char *argv[]) {
     if (argc < 3) {
