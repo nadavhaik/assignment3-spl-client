@@ -14,6 +14,9 @@ RegisterMessage::RegisterMessage(const string &command)
 }
 
 vector<char> RegisterMessage::encode() {
+    vector<string> result;
+    split(result, str, boost::is_any_of(" "));
+    short op = opcode(result[0]);
     vector<char> encodedCommand = new vector<char>;
 
     return vector<char>();

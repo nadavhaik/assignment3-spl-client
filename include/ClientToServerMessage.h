@@ -106,7 +106,7 @@ private:
 
 class FetchNotificationMessage : public ClientToServerMessage {
 public:
-    FetchNotificationMessage(const string &command, string userName);
+    FetchNotificationMessage();
     vector<char> encode() const override;
 
 };
