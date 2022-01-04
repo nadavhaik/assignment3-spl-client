@@ -76,7 +76,7 @@ vector<char> LoginMessage::encode() {
 }
 
 LogoutMessage::LogoutMessage(const string &command)
-    : ClientToServerMessage(LOGOUT, command), {}
+    : ClientToServerMessage(LOGOUT, command) {}
 
 vector<char> LogoutMessage::encode() {
     vector<char> encodedCommand;
@@ -87,7 +87,7 @@ vector<char> LogoutMessage::encode() {
 }
 
 FollowOrUnfollowMessage::FollowOrUnfollowMessage(const string &command)
-        : ClientToServerMessage(FOLLOW_OR_UNFOLLOW, command), {}
+        : ClientToServerMessage(FOLLOW_OR_UNFOLLOW, command) {}
 
 vector<char> FollowOrUnfollowMessage::encode() {
     vector<char> encodedCommand;
@@ -101,7 +101,7 @@ vector<char> FollowOrUnfollowMessage::encode() {
         encodedCommand.push_back((char)0);
     else
         encodedCommand.push_back((char)1);
-    
+
     otherUserName = result[2];
     for (int i = 0; i < otherUserName.size(); i++) {
         encodedCommand.push_back(otherUserName[i]);
