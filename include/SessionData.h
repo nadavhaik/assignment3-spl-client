@@ -12,7 +12,6 @@ public:
     void run();
 private:
     ConnectionHandler ch;
-    void fetchNotifications();
     bool loggedIn = false;
     bool shouldStop = false;
 };
