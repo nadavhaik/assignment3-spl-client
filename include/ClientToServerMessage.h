@@ -21,14 +21,17 @@ enum cts_message_type {
 
 class ClientToServerMessage{
 public:
-    ClientToServerMessage(cts_message_type type);
-    virtual vector<char> encode()=0;
+    ClientToServerMessage(cts_message_type type, string command);
+    virtual const vector<char> encode()=0;
+private:
+    cts_message_type type;
+    string command;
 };
 
 class RegisterMessage : public ClientToServerMessage {
 public:
-    RegisterMessage(const vector<char> &message);
-    vector<char> encode();
+    explicit RegisterMessage(const string &command);
+    const vector<char> encode();
 private:
     string username;
     string password;
@@ -37,8 +40,8 @@ private:
 
 class LoginMessage : public ClientToServerMessage {
 public:
-    LoginMessage(const vector<char> &message);
-    vector<char> encode();
+    LoginMessage(const string &command);
+    const vector<char> encode();
 private:
     string username;
     string password;
@@ -47,14 +50,14 @@ private:
 
 class LogoutMessage : public ClientToServerMessage {
 public:
-    LogoutMessage(const vector<char> &message, string userName);
-    vector<char> encode();
+    LogoutMessage(const string &command, string userName);
+    const vector<char> encode();
 };
 
 class FollowOrUnfollowMessage : public ClientToServerMessage {
 public:
-    FollowOrUnfollowMessage(const vector<char> &message, string userName);
-    vector<char> encode();
+    FollowOrUnfollowMessage(const string &command, string userName);
+    const vector<char> encode();
 private:
     bool follow;
     string otherUserName;
@@ -62,16 +65,17 @@ private:
 
 class PostMessage : public ClientToServerMessage {
 public:
-    PostMessage(const vector<char> &message, string userName);
-    vector<char> encode();
+    PostMessage(const string &command, string userName);
+    const vector<char> encode();
 private:
     string content;
+
 };
 
 class PMMessage : public ClientToServerMessage {
 public:
-    PMMessage(const vector<char> &message, string userName);
-    vector<char> encode();
+    PMMessage(const string &command, string userName);
+    const vector<char> encode();
 private:
     string content;
     string sendingTimeAndDate;
@@ -80,30 +84,30 @@ private:
 
 class LoggedInStates : public ClientToServerMessage {
 public:
-    LoggedInStates(const vector<char> &message, string userName);
-    vector<char> encode();
+    LoggedInStates(const string &command, string userName);
+    const vector<char> encode();
 };
 
 class StatisticsMessage : public ClientToServerMessage {
 public:
-    StatisticsMessage(const vector<char> &message, string userName);
-    vector<char> encode();
+    StatisticsMessage(const string &command, string userName);
+    const vector<char> encode();
 private:
     vector<string> userNamesList;
 };
 
 class BlockMessage : public ClientToServerMessage {
 public:
-    BlockMessage(const vector<char> &message, string userName);
-    vector<char> encode();
+    BlockMessage(const string &command, string userName);
+    const vector<char> encode();
 private:
     string otherUserName;
 };
 
 class FetchNotificationMessage : public ClientToServerMessage {
 public:
-    FetchNotificationMessage(const vector<char> &message, string userName);
-    vector<char> encode();
+    FetchNotificationMessage(const string &command, string userName);
+    const vector<char> encode();
 
 };
 
