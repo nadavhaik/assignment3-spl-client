@@ -82,11 +82,15 @@ AckMessage::AckMessage(const vector<char> &bytes)
 void AckMessage::decode() {
     vector<char> notificationBytes = {bytes[2], bytes[3]};
     messageOP = Caster::byteVectorToShort(notificationBytes);
+    for(size_t i = 4; i < bytes.size()-1; i++)
+        content += bytes[i];
 }
 
 std::string AckMessage::toString() {
     string s = "ACK ";
     s += to_string(messageOP);
+    s += " ";
+    s += content;
 
     return s;
 }

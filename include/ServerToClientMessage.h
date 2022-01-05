@@ -4,6 +4,7 @@ using namespace std;
 
 #ifndef ASSIGNMENT3_SPL_CLIENT_SERVERTOCLIENTMESSAGE_H
 #define ASSIGNMENT3_SPL_CLIENT_SERVERTOCLIENTMESSAGE_H
+class connection_exception : std::exception {};
 
 enum stc_message_type {
     NOTIFICATION = 9,
@@ -45,6 +46,7 @@ public:
     std::string toString() override;
 private:
     short messageOP;
+    string content;
 };
 
 class ErrorMessage : public ServerToClientMessage {

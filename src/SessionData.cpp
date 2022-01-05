@@ -36,6 +36,7 @@ SessionData::~SessionData() {
     ch.close();
 }
 bool SessionData::isLoggedIn() {
+    ch.connect();
     return loggedIn;
 }
 bool SessionData::getShouldStop() {
@@ -58,9 +59,9 @@ void SessionData::run() {
                 message = new LogoutMessage(input_command);
             else if (input_command.rfind("FOLLOW ", 0) == 0)
                 message = new FollowOrUnfollowMessage(input_command);
-            else if (input_command.rfind("POST_NOTIFICATION ", 0) == 0)
+            else if (input_command.rfind("POST ", 0) == 0)
                 message = new PostMessage(input_command);
-            else if (input_command.rfind("PM_NOTIFICATION ", 0) == 0)
+            else if (input_command.rfind("PM ", 0) == 0)
                 message = new PMMessage(input_command);
             else if (input_command == "LOGSTAT")
                 message = new LoggedInStates(input_command);
@@ -97,7 +98,7 @@ ServerToClientMessage *SessionData::communicate(ClientToServerMessage &message) 
     vector<char> bytesVec = message.encode();
     char *bytes = toBytesMessage(bytesVec);
     if(!loggedIn)
-        ch.connect();
+
     while(!ch.sendBytes(bytes, (int)bytesVec.size()+1));
     string response;
     while(!ch.getFrameAscii(response, ';'));

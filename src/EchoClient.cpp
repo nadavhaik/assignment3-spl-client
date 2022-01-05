@@ -8,8 +8,13 @@ int main (int argc, char *argv[]) {
 
     std::string host = argv[1];
     short port = atoi(argv[2]);
-    SessionData s(host, port);
-    s.run();
+    try {
+        SessionData s(host, port);
+        s.run();
+    } catch(connection_exception e) {
+        std::cerr << "Could not connect to host " << argv[0] << " in port " << argv[2] << std::endl << std::endl;
+        return -1;
+    }
 
     return 0;
 

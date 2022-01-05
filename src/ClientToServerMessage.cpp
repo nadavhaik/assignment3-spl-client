@@ -121,9 +121,13 @@ vector<char> FollowOrUnfollowMessage::encode() {
 PostMessage::PostMessage(const string &command) : ClientToServerMessage(POST) {
     vector<string> result;
     split(result, command, boost::is_any_of(" "));
-    if(result.size() != 2)
+    if(result.size() < 2)
         throw parsing_exception();
-    content = result[1];
+    for(size_t i=1; i<result.size(); i++) {
+        content += result[i];
+        content += " ";
+    }
+    content = content.substr(0, content.size()-2);
 }
 
 vector<char> PostMessage::encode() {
@@ -141,10 +145,14 @@ vector<char> PostMessage::encode() {
 PMMessage::PMMessage(const string &command) : ClientToServerMessage(PRIVATE_MESSAGE) {
     vector<string> result;
     split(result, command, boost::is_any_of(" "));
-    if(result.size() != 3)
+    if(result.size() < 3)
         throw parsing_exception();
     otherUserName = result[1];
-    content = result[2];
+    for(size_t i=2; i<result.size(); i++) {
+        content += result[i];
+        content += " ";
+    }
+    content = content.substr(0, content.size()-2);
 
     auto t = time(nullptr);
     auto tm = *localtime(&t);
@@ -182,12 +190,12 @@ vector<char> LoggedInStates::encode() {
     return encodedCommand;
 }
 
-StatisticsMessage::StatisticsMessage(const string &command) : ClientToServerMessage(LOGGED_IN_STATES) {
+StatisticsMessage::StatisticsMessage(const string &command) : ClientToServerMessage(STATISTICS) {
     vector<string> result;
     split(result, command, boost::is_any_of(" "));
     if(result.size() != 2)
         throw parsing_exception();
-    usernames = result[2];
+    usernames = result[1];
 }
 
 vector<char> StatisticsMessage::encode() {
