@@ -92,8 +92,8 @@ void SessionData::run() {
         delete message;
         delete response;
     }
-
-    t.join();
+    if(t.joinable()) // else it died before
+        t.join();
 
 }
 
