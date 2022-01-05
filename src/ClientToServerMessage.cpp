@@ -4,17 +4,20 @@
 #include "../include/ClientToServerMessage.h"
 #include "../include/Caster.h"
 #include <boost/algorithm/string.hpp>
+#include <ctime>
+#include <iomanip>
+#include <sstream>
 
 using namespace std;
 
-ClientToServerMessage::ClientToServerMessage(cts_message_type type, string command): type(type), command(command) {}
+ClientToServerMessage::ClientToServerMessage(cts_message_type type): type(type) {}
 
 int ClientToServerMessage::getType() {
     return type;
 }
 
 RegisterMessage::RegisterMessage(const string &command)
-    : ClientToServerMessage(REGISTER, command) {
+    : ClientToServerMessage(REGISTER) {
     vector<string> result;
     split(result, command, boost::is_any_of(" "));
     if(result.size() != 4)
@@ -43,7 +46,7 @@ vector<char> RegisterMessage::encode() {
 }
 
 LoginMessage::LoginMessage(const string &command)
-    : ClientToServerMessage(LOGIN, command) {
+    : ClientToServerMessage(LOGIN) {
     vector<string> result;
     if(result.size() != 4)
         throw parsing_exception();
@@ -75,7 +78,7 @@ vector<char> LoginMessage::encode() {
 }
 
 LogoutMessage::LogoutMessage(const string &command)
-    : ClientToServerMessage(LOGOUT, command) {
+    : ClientToServerMessage(LOGOUT) {
     if(command != "LOGOUT")
         throw parsing_exception();
 }
@@ -89,7 +92,7 @@ vector<char> LogoutMessage::encode() {
 }
 
 FollowOrUnfollowMessage::FollowOrUnfollowMessage(const string &command)
-        : ClientToServerMessage(FOLLOW_OR_UNFOLLOW, command) {
+        : ClientToServerMessage(FOLLOW_OR_UNFOLLOW) {
     vector<string> result;
     split(result, command, boost::is_any_of(" "));
     if(result.size() != 3)
@@ -112,4 +115,63 @@ vector<char> FollowOrUnfollowMessage::encode() {
     encodedCommand.push_back('\0');
 
     return encodedCommand;
+}
+
+PostMessage::PostMessage(const string &command) : ClientToServerMessage(POST) {
+    vector<string> result;
+    split(result, command, boost::is_any_of(" "));
+    if(result.size() != 2)
+        throw parsing_exception();
+    content = result[1];
+}
+
+vector<char> PostMessage::encode() {
+    vector<char> encodedCommand;
+    vector<char> opCode = Caster::shortToBytesVector(5);
+    encodedCommand.push_back(opCode[0]);
+    encodedCommand.push_back(opCode[1]);
+    for(char c : content)
+        encodedCommand.push_back(c);
+    encodedCommand.push_back('\0');
+    return encodedCommand;
+}
+
+
+PMMessage::PMMessage(const string &command) : ClientToServerMessage(PRIVATE_MESSAGE) {
+    vector<string> result;
+    split(result, command, boost::is_any_of(" "));
+    if(result.size() != 3)
+        throw parsing_exception();
+    otherUserName = result[1];
+    content = result[2];
+
+    auto t = time(nullptr);
+    auto tm = *localtime(&t);
+    std::ostringstream oss;
+    oss << std::put_time(&tm, "%d-%m-%Y %H-%M");
+    sendingTimeAndDate = oss.str();
+}
+
+vector<char> PMMessage::encode() {
+    vector<char> encodedCommand;
+    vector<char> opCode = Caster::shortToBytesVector(6);
+    encodedCommand.push_back(opCode[0]);
+    encodedCommand.push_back(opCode[1]);
+    for(char &c : otherUserName)
+        encodedCommand.push_back(c);
+    encodedCommand.push_back('\0');
+    for(char &c : content)
+        encodedCommand.push_back(c);
+    encodedCommand.push_back('\0');
+    for(char &c : sendingTimeAndDate)
+        encodedCommand.push_back(c);
+    encodedCommand.push_back('\0');
+
+    return encodedCommand;
+}
+
+LoggedInStates::LoggedInStates(const string &command): ClientToServerMessage(LOGGED_IN_STATES) {}
+
+vector<char> LoggedInStates::encode() {
+
 }

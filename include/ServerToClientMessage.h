@@ -12,8 +12,8 @@ enum stc_message_type {
 };
 
 enum notification_type {
-    POST,
-    PM
+    POST_NOTIFICATION,
+    PM_NOTIFICATION
 };
 
 class ServerToClientMessage {

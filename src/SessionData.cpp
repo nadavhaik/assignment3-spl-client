@@ -54,15 +54,15 @@ void SessionData::run() {
                 message = new RegisterMessage(input_command);
             else if (input_command.rfind("LOGIN ", 0) == 0)
                 message = new LoginMessage(input_command);
-            else if (input_command.rfind("LOGOUT", 0) == 0)
+            else if (input_command == "LOGOUT")
                 message = new LogoutMessage(input_command);
             else if (input_command.rfind("FOLLOW ", 0) == 0)
                 message = new FollowOrUnfollowMessage(input_command);
-            else if (input_command.rfind("POST ", 0) == 0)
+            else if (input_command.rfind("POST_NOTIFICATION ", 0) == 0)
                 message = new PostMessage(input_command);
-            else if (input_command.rfind("PM ", 0) == 0)
+            else if (input_command.rfind("PM_NOTIFICATION ", 0) == 0)
                 message = new PMMessage(input_command);
-            else if (input_command.rfind("LOGSTAT", 0) == 0)
+            else if (input_command == "LOGSTAT")
                 message = new LoggedInStates(input_command);
             else if (input_command.rfind("STAT ", 0) == 0)
                 message = new StatisticsMessage(input_command);

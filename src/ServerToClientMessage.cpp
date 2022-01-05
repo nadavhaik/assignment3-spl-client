@@ -21,7 +21,7 @@ NotificationMessage::NotificationMessage(const vector<char> &bytes)
 void NotificationMessage::decode() {
     char notificationBytes[] = {bytes[2]};
     short typeCode = Caster::bytesToShort(notificationBytes);
-    n_type = (typeCode == 0) ? PM : POST;
+    n_type = (typeCode == 0) ? PM_NOTIFICATION : POST_NOTIFICATION;
     size_t i = 3;
     char byte = bytes[i];
     string s;
@@ -46,8 +46,8 @@ void NotificationMessage::decode() {
 std::string NotificationMessage::toString() {
     string s;
     s += "NOTIFICATION ";
-    if(n_type == PM)
-        s += "PM ";
+    if(n_type == PM_NOTIFICATION)
+        s += "PM_NOTIFICATION ";
     else
         s += "Public ";
     s += author;
