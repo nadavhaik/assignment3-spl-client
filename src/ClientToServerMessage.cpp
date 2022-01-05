@@ -29,7 +29,7 @@ RegisterMessage::RegisterMessage(const string &command)
 
 vector<char> RegisterMessage::encode() {
     vector<char> encodedCommand;
-    vector<char> opCode = Caster::shortToBytesVector(1);
+    vector<char> opCode = Caster::shortToBytesVector((short)getType());
     encodedCommand.push_back(opCode[0]);
     encodedCommand.push_back(opCode[1]);
     for (char &c : username)
@@ -58,7 +58,7 @@ LoginMessage::LoginMessage(const string &command)
 
 vector<char> LoginMessage::encode() {
     vector<char> encodedCommand;
-    vector<char> opCode = Caster::shortToBytesVector(2);
+    vector<char> opCode = Caster::shortToBytesVector((short)getType());
     encodedCommand.push_back(opCode[0]);
     encodedCommand.push_back(opCode[1]);
 
@@ -85,7 +85,7 @@ LogoutMessage::LogoutMessage(const string &command)
 
 vector<char> LogoutMessage::encode() {
     vector<char> encodedCommand;
-    vector<char> opCode = Caster::shortToBytesVector(3);
+    vector<char> opCode = Caster::shortToBytesVector((short)getType());
     encodedCommand.push_back(opCode[0]);
     encodedCommand.push_back(opCode[1]);
     return encodedCommand;
@@ -103,7 +103,7 @@ FollowOrUnfollowMessage::FollowOrUnfollowMessage(const string &command)
 
 vector<char> FollowOrUnfollowMessage::encode() {
     vector<char> encodedCommand;
-    vector<char> opCode = Caster::shortToBytesVector(4);
+    vector<char> opCode = Caster::shortToBytesVector((short)getType());
     encodedCommand.push_back(opCode[0]);
     encodedCommand.push_back(opCode[1]);
     if(follow)
@@ -127,7 +127,7 @@ PostMessage::PostMessage(const string &command) : ClientToServerMessage(POST) {
 
 vector<char> PostMessage::encode() {
     vector<char> encodedCommand;
-    vector<char> opCode = Caster::shortToBytesVector(5);
+    vector<char> opCode = Caster::shortToBytesVector((short)getType());
     encodedCommand.push_back(opCode[0]);
     encodedCommand.push_back(opCode[1]);
     for(char c : content)
@@ -154,7 +154,7 @@ PMMessage::PMMessage(const string &command) : ClientToServerMessage(PRIVATE_MESS
 
 vector<char> PMMessage::encode() {
     vector<char> encodedCommand;
-    vector<char> opCode = Caster::shortToBytesVector(6);
+    vector<char> opCode = Caster::shortToBytesVector((short)getType());
     encodedCommand.push_back(opCode[0]);
     encodedCommand.push_back(opCode[1]);
     for(char &c : otherUserName)
@@ -173,5 +173,62 @@ vector<char> PMMessage::encode() {
 LoggedInStates::LoggedInStates(const string &command): ClientToServerMessage(LOGGED_IN_STATES) {}
 
 vector<char> LoggedInStates::encode() {
+    vector<char> encodedCommand;
+    vector<char> opCode = Caster::shortToBytesVector((short)getType());
+    encodedCommand.push_back(opCode[0]);
+    encodedCommand.push_back(opCode[1]);
 
+    return encodedCommand;
 }
+
+StatisticsMessage::StatisticsMessage(const string &command) : ClientToServerMessage(LOGGED_IN_STATES) {
+    vector<string> result;
+    split(result, command, boost::is_any_of(" "));
+    if(result.size() != 2)
+        throw parsing_exception();
+    usernames = result[2];
+}
+
+vector<char> StatisticsMessage::encode() {
+    vector<char> encodedCommand;
+    vector<char> opCode = Caster::shortToBytesVector((short)getType());
+    encodedCommand.push_back(opCode[0]);
+    encodedCommand.push_back(opCode[1]);
+    for(char &c : usernames)
+        encodedCommand.push_back(c);
+    encodedCommand.push_back('\0');
+
+    return encodedCommand;
+}
+
+BlockMessage::BlockMessage(const string &command) : ClientToServerMessage(BLOCK) {
+    vector<string> result;
+    split(result, command, boost::is_any_of(" "));
+    if(result.size() != 2)
+        throw parsing_exception();
+    otherUserName = result[1];
+}
+
+vector<char> BlockMessage::encode() {
+    vector<char> encodedCommand;
+    vector<char> opCode = Caster::shortToBytesVector((short)getType());
+    encodedCommand.push_back(opCode[0]);
+    encodedCommand.push_back(opCode[1]);
+    for(char &c : otherUserName)
+        encodedCommand.push_back(c);
+    encodedCommand.push_back('\0');
+
+    return encodedCommand;
+}
+
+FetchNotificationMessage::FetchNotificationMessage() : ClientToServerMessage(FETCH_NOTIFICATION) {}
+
+vector<char> FetchNotificationMessage::encode() {
+    vector<char> encodedCommand;
+    vector<char> opCode = Caster::shortToBytesVector((short)getType());
+    encodedCommand.push_back(opCode[0]);
+    encodedCommand.push_back(opCode[1]);
+
+    return encodedCommand;
+}
+

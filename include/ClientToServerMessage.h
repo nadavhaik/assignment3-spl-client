@@ -95,7 +95,7 @@ public:
     explicit StatisticsMessage(const string &command);
     vector<char> encode() override;
 private:
-    vector<string> userNamesList;
+    string usernames;
 };
 
 class BlockMessage : public ClientToServerMessage {
@@ -110,7 +110,6 @@ class FetchNotificationMessage : public ClientToServerMessage {
 public:
     explicit FetchNotificationMessage();
     vector<char> encode() override;
-
 };
 
 
