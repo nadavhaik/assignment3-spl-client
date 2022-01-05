@@ -74,7 +74,7 @@ std::string ErrorMessage::toString() {
     return s;
 }
 
-AckMessage::AckMessage(const vector<char> &bytes)
+AckMessage::AckMessage(const vector<char> &bytes, int originalMessageType)
         :ServerToClientMessage(ACK, bytes){
     decode();
 }

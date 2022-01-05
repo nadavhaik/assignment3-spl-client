@@ -119,7 +119,7 @@ ServerToClientMessage *SessionData::communicate(ClientToServerMessage &message) 
             responseMessage = new NotificationMessage(responseBytes);
             break;
         case 10:
-            responseMessage = new AckMessage(responseBytes);
+            responseMessage = new AckMessage(responseBytes, message.getType());
             break;
         case 11:
             responseMessage = new ErrorMessage(responseBytes);

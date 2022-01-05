@@ -1,7 +1,7 @@
 using namespace std;
 #include <vector>
 #include <string>
-
+#include "ClientToServerMessage.h"
 #ifndef ASSIGNMENT3_SPL_CLIENT_SERVERTOCLIENTMESSAGE_H
 #define ASSIGNMENT3_SPL_CLIENT_SERVERTOCLIENTMESSAGE_H
 class connection_exception : std::exception {};
@@ -41,12 +41,13 @@ private:
 
 class AckMessage : public ServerToClientMessage {
 public:
-    explicit AckMessage(const vector<char> &bytes);
+    explicit AckMessage(const vector<char> &bytes, int originalMessageType);
     void decode();
     std::string toString() override;
 private:
     short messageOP;
     string content;
+    int originalMessageType;
 };
 
 class ErrorMessage : public ServerToClientMessage {
