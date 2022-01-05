@@ -4,7 +4,7 @@
 #include <vector>
 #include <unistd.h>
 #include <thread>
-#include "Casters.cpp"
+#include "../include/Caster.h"
 
 using namespace std;
 const unsigned int FETCHING_INTERVAL = 100;
@@ -109,7 +109,7 @@ ServerToClientMessage *SessionData::communicate(ClientToServerMessage &message) 
 
     ServerToClientMessage *responseMessage = nullptr;
     char opCodeBytes[] = {responseBytes[0], responseBytes[1]};
-    short opCode = bytesToShort(opCodeBytes);
+    short opCode = Caster::bytesToShort(opCodeBytes);
 
     switch(opCode) {
         case 9:

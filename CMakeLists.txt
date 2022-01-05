@@ -8,7 +8,6 @@ add_executable(
         src/EchoClient.cpp
         include/ConnectionHandler.h
         src/ConnectionHandler.cpp
-        src/Casters.cpp
         include/ClientToServerMessage.h src/ClientToServerMessage.cpp
-        include/ServerToClientMessage.h src/ServerToClientMessage.cpp include/SessionData.h src/SessionData.cpp)
+        include/ServerToClientMessage.h src/ServerToClientMessage.cpp include/SessionData.h src/SessionData.cpp src/Caster.cpp include/Caster.h)
 

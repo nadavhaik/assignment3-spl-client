@@ -1,9 +1,8 @@
 #include <stdlib.h>
 
-#include "../include/connectionHandler.h"
+#include "../include/ConnectionHandler.h"
 #include "../include/ClientToServerMessage.h"
 #include "../include/ServerToClientMessage.h"
-#include "Casters.cpp"
 #include "../include/SessionData.h"
 
 

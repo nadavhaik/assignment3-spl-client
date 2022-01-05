@@ -3,7 +3,7 @@
 //
 
 #include "../include/ServerToClientMessage.h"
-#include "Casters.cpp"
+#include "../include/Caster.h"
 
 
 ServerToClientMessage::ServerToClientMessage(stc_message_type type, vector<char> bytes): notificationType(type), bytes(bytes) {}
@@ -20,7 +20,7 @@ NotificationMessage::NotificationMessage(const vector<char> &bytes)
 
 void NotificationMessage::decode() {
     char notificationBytes[] = {bytes[2]};
-    short typeCode = bytesToShort(notificationBytes);
+    short typeCode = Caster::bytesToShort(notificationBytes);
     n_type = (typeCode == 0) ? PM : POST;
     size_t i = 3;
     char byte = bytes[i];
@@ -65,7 +65,7 @@ ErrorMessage::ErrorMessage(const vector<char> &bytes):
 
 void ErrorMessage::decode() {
     vector<char> notificationBytes = {bytes[2], bytes[3]};
-    messageOP = byteVectorToShort(notificationBytes);
+    messageOP = Caster::byteVectorToShort(notificationBytes);
 }
 
 std::string ErrorMessage::toString() {
@@ -81,7 +81,7 @@ AckMessage::AckMessage(const vector<char> &bytes)
 
 void AckMessage::decode() {
     vector<char> notificationBytes = {bytes[2], bytes[3]};
-    messageOP = byteVectorToShort(notificationBytes);
+    messageOP = Caster::byteVectorToShort(notificationBytes);
 }
 
 std::string AckMessage::toString() {

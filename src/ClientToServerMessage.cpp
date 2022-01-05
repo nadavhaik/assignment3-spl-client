@@ -2,7 +2,7 @@
 // Created by niv19 on 04/01/2022.
 //
 #include "../include/ClientToServerMessage.h"
-#include "Casters.cpp"
+#include "../include/Caster.h"
 #include <boost/algorithm/string.hpp>
 
 using namespace std;
@@ -26,7 +26,7 @@ RegisterMessage::RegisterMessage(const string &command)
 
 vector<char> RegisterMessage::encode() {
     vector<char> encodedCommand;
-    vector<char> opCode = shortToBytesVector(1);
+    vector<char> opCode = Caster::shortToBytesVector(1);
     encodedCommand.push_back(opCode[0]);
     encodedCommand.push_back(opCode[1]);
     for (char &c : username)
@@ -55,7 +55,7 @@ LoginMessage::LoginMessage(const string &command)
 
 vector<char> LoginMessage::encode() {
     vector<char> encodedCommand;
-    vector<char> opCode = shortToBytesVector(2);
+    vector<char> opCode = Caster::shortToBytesVector(2);
     encodedCommand.push_back(opCode[0]);
     encodedCommand.push_back(opCode[1]);
 
@@ -82,7 +82,7 @@ LogoutMessage::LogoutMessage(const string &command)
 
 vector<char> LogoutMessage::encode() {
     vector<char> encodedCommand;
-    vector<char> opCode = shortToBytesVector(3);
+    vector<char> opCode = Caster::shortToBytesVector(3);
     encodedCommand.push_back(opCode[0]);
     encodedCommand.push_back(opCode[1]);
     return encodedCommand;
@@ -100,7 +100,7 @@ FollowOrUnfollowMessage::FollowOrUnfollowMessage(const string &command)
 
 vector<char> FollowOrUnfollowMessage::encode() {
     vector<char> encodedCommand;
-    vector<char> opCode = shortToBytesVector(4);
+    vector<char> opCode = Caster::shortToBytesVector(4);
     encodedCommand.push_back(opCode[0]);
     encodedCommand.push_back(opCode[1]);
     if(follow)

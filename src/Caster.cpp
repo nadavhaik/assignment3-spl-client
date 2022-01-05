@@ -1,18 +1,16 @@
-#include <vector>
-using namespace std;
+//
+// Created by ditto on 05-Jan-22.
+//
 
+#include "../include/Caster.h"
 
-short bytesToShort(char* bytesArr){
+short Caster::bytesToShort(char* bytesArr) {
     short result = (short)((bytesArr[0] & 0xff) << 8);
     result += (short)(bytesArr[1] & 0xff);
     return result;
 }
 
-void shortToBytes(short num, char* bytesArr) {
-    bytesArr[0] = ((num >> 8) & 0xFF);
-    bytesArr[1] = (num & 0xFF);
-}
-short byteVectorToShort(vector<char> vectorList) {
+short Caster::byteVectorToShort(vector<char> vectorList) {
     char *a = new char[vectorList.size()];
     for(size_t i=0; i<vectorList.size(); i++) {
         a[i] = vectorList[i];
@@ -22,7 +20,7 @@ short byteVectorToShort(vector<char> vectorList) {
     return res;
 }
 
-vector<char> shortToBytesVector(short num) {
+vector<char> Caster::shortToBytesVector(short num) {
     vector<char> v;
     v.push_back(((num >> 8) & 0xFF));
     v.push_back((num & 0xFF));
