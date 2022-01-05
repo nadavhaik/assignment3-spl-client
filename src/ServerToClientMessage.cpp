@@ -47,7 +47,7 @@ std::string NotificationMessage::toString() {
     string s;
     s += "NOTIFICATION ";
     if(n_type == PM_NOTIFICATION)
-        s += "PM_NOTIFICATION ";
+        s += "PM ";
     else
         s += "Public ";
     s += author;

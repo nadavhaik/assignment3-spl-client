@@ -4,6 +4,7 @@
 #include <vector>
 #include <unistd.h>
 #include <thread>
+#include <chrono>
 #include "../include/Caster.h"
 
 using namespace std;
@@ -27,16 +28,18 @@ void fetchNotifications(SessionData *sd) {
             delete message;
             delete response;
         }
-        sleep(FETCHING_INTERVAL);
+        this_thread::sleep_for(chrono::milliseconds(FETCHING_INTERVAL));
     }
 }
 
-SessionData::SessionData(string ip, short port): ch(ip, port) {}
+SessionData::SessionData(string ip, short port): ch(ip, port) {
+    if(!ch.connect())
+        throw connection_exception();
+}
 SessionData::~SessionData() {
     ch.close();
 }
 bool SessionData::isLoggedIn() {
-    ch.connect();
     return loggedIn;
 }
 bool SessionData::getShouldStop() {
@@ -46,6 +49,7 @@ bool SessionData::getShouldStop() {
 
 void SessionData::run() {
     std::thread t(fetchNotifications, this);
+    t.detach();
     while(!shouldStop) {
         string input_command;
         getline(cin, input_command);
@@ -97,8 +101,6 @@ ServerToClientMessage *SessionData::communicate(ClientToServerMessage &message) 
     connectionLock.lock();
     vector<char> bytesVec = message.encode();
     char *bytes = toBytesMessage(bytesVec);
-    if(!loggedIn)
-
     while(!ch.sendBytes(bytes, (int)bytesVec.size()+1));
     string response;
     while(!ch.getFrameAscii(response, ';'));

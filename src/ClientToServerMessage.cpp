@@ -157,7 +157,7 @@ PMMessage::PMMessage(const string &command) : ClientToServerMessage(PRIVATE_MESS
     auto t = time(nullptr);
     auto tm = *localtime(&t);
     std::ostringstream oss;
-    oss << std::put_time(&tm, "%d-%m-%Y %H-%M");
+    oss << std::put_time(&tm, "%d-%m-%Y %H:%M");
     sendingTimeAndDate = oss.str();
 }
 
