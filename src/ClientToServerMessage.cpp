@@ -48,6 +48,7 @@ vector<char> RegisterMessage::encode() {
 LoginMessage::LoginMessage(const string &command)
     : ClientToServerMessage(LOGIN) {
     vector<string> result;
+    split(result, command, boost::is_any_of(" "));
     if(result.size() != 4)
         throw parsing_exception();
     split(result, command, boost::is_any_of(" "));
