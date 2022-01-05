@@ -53,7 +53,7 @@ public:
     void decode();
     std::string toString() override;
 private:
-    short messageOP{};
+    short messageOP;
 };
 
 
