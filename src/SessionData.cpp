@@ -49,31 +49,32 @@ void SessionData::run() {
         string input_command;
         getline(cin, input_command);
         ClientToServerMessage *message = nullptr;
-        if(input_command.rfind("REGISTER",0) == 0)
-            message = new RegisterMessage(input_command);
-        else if(input_command.rfind("LOGIN",0) == 0)
-            message = new LoginMessage(input_command);
-        else if(input_command.rfind("LOGOUT",0) == 0)
-            message = new LogoutMessage(input_command);
-        else if(input_command.rfind("REGISTER",0) == 0)
-            message = new RegisterMessage(input_command);
-        else if(input_command.rfind("FOLLOW", 0) == 0)
-            message = new FollowOrUnfollowMessage(input_command);
-        else if(input_command.rfind("POST", 0) == 0)
-            message = new PostMessage(input_command);
-        else if(input_command.rfind("PM", 0) == 0)
-            message = new PMMessage(input_command);
-        else if(input_command.rfind("LOGSTAT", 0) == 0)
-            message = new LoggedInStates(input_command);
-        else if(input_command.rfind("STAT", 0) == 0)
-            message = new StatisticsMessage(input_command);
-        else if(input_command.rfind("BLOCK", 0) == 0)
-            message = new BlockMessage(input_command);
-
-        if(message == nullptr) {
+        try {
+            if (input_command.rfind("REGISTER ", 0) == 0)
+                message = new RegisterMessage(input_command);
+            else if (input_command.rfind("LOGIN ", 0) == 0)
+                message = new LoginMessage(input_command);
+            else if (input_command.rfind("LOGOUT", 0) == 0)
+                message = new LogoutMessage(input_command);
+            else if (input_command.rfind("FOLLOW ", 0) == 0)
+                message = new FollowOrUnfollowMessage(input_command);
+            else if (input_command.rfind("POST ", 0) == 0)
+                message = new PostMessage(input_command);
+            else if (input_command.rfind("PM ", 0) == 0)
+                message = new PMMessage(input_command);
+            else if (input_command.rfind("LOGSTAT", 0) == 0)
+                message = new LoggedInStates(input_command);
+            else if (input_command.rfind("STAT ", 0) == 0)
+                message = new StatisticsMessage(input_command);
+            else if (input_command.rfind("BLOCK ", 0) == 0)
+                message = new BlockMessage(input_command);
+            else
+                throw parsing_exception();
+        } catch (parsing_exception &e) {
             cout << "Illegal command" << endl;
             continue;
         }
+
 
         ServerToClientMessage *response = communicate(*message);
         cout << response->toString() << endl;

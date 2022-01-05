@@ -5,6 +5,7 @@ using namespace std;
 #ifndef ASSIGNMENT3_SPL_CLIENT_CLIENTTOSERVERMESSAGE_H
 #define ASSIGNMENT3_SPL_CLIENT_CLIENTTOSERVERMESSAGE_H
 
+class parsing_exception : std::exception {};
 
 enum cts_message_type {
     REGISTER = 1,
