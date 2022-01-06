@@ -113,8 +113,10 @@ void AckMessage::decode() {
 std::string AckMessage::toString() {
     string s = "ACK ";
     s += to_string(messageOP);
-    s += " ";
-    s += content;
+    if(!content.empty()) {
+        s += " ";
+        s += content;
+    }
 
     return s;
 }
