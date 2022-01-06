@@ -8,7 +8,8 @@
 #include "../include/Caster.h"
 
 using namespace std;
-const unsigned int FETCHING_INTERVAL = 100;
+const unsigned int FETCHING_INTERVAL = 500; // Milliseconds
+
 char *toBytesMessage(const vector<char> &v) {
     char *c = new char[v.size()+1];
     for(size_t i=0; i<v.size(); i++)
