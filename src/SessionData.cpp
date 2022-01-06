@@ -22,7 +22,13 @@ void fetchNotifications(SessionData *sd) {
     while(!sd->getShouldStop()) {
         if(sd->isLoggedIn()) {
             FetchNotificationMessage message;
-            ServerToClientMessage *response = sd->communicate(message);
+            ServerToClientMessage *response;
+            try {
+                response = sd->communicate(message);
+            } catch (communication_exception &e) {
+                cout << "Could not communicate!" << endl;
+                break;
+            }
             if(response->getType() == 9) // Only Notification-type responses will be printed
                 cout << response->toString() << endl;
             delete response;
@@ -52,7 +58,7 @@ void SessionData::run() {
     while(!shouldStop) {
         string input_command;
         getline(cin, input_command);
-        ClientToServerMessage *message = nullptr;
+        ClientToServerMessage *message;
         try {
             if (input_command.rfind("REGISTER ", 0) == 0)
                 message = new RegisterMessage(input_command);
@@ -79,14 +85,20 @@ void SessionData::run() {
             continue;
         }
 
-
-        ServerToClientMessage *response = communicate(*message);
+        ServerToClientMessage *response;
+        try {
+            response = communicate(*message);
+        } catch(communication_exception &e) {
+            cout << "Could not communicate!" << endl;
+            delete message;
+            break;
+        }
         cout << response->toString() << endl;
         if(message->getType() == 2 && response->getType() == 10) // LOGIN + ACK
             loggedIn = true;
         if(message->getType() == 3 && response->getType() == 10) { // LOGOUT + ACK
             loggedIn = false;
-            shouldStop = true;
+            this->stop();
         }
         delete message;
         delete response;
@@ -97,12 +109,23 @@ void SessionData::run() {
 }
 
 ServerToClientMessage *SessionData::communicate(ClientToServerMessage &message) {
-    connectionLock.lock();
     vector<char> bytesVec = message.encode();
     char *bytes = toBytesMessage(bytesVec);
-    while(!ch.sendBytes(bytes, (int)bytesVec.size()+1));
     string response;
-    while(!ch.getFrameAscii(response, ';'));
+
+    connectionLock.lock();
+    if(!ch.sendBytes(bytes, (int)bytesVec.size()+1)) {
+        delete bytes;
+        connectionLock.unlock();
+        this->stop();
+        throw communication_exception();
+    }
+    if(!ch.getFrameAscii(response, ';')) {
+        delete bytes;
+        connectionLock.unlock();
+        this->stop();
+        throw communication_exception();
+    }
     connectionLock.unlock();
 
     vector<char> responseBytes;
@@ -128,6 +151,10 @@ ServerToClientMessage *SessionData::communicate(ClientToServerMessage &message) 
     delete bytes;
     return responseMessage;
 
+}
+
+void SessionData::stop() {
+    shouldStop = true;
 }
 
 
