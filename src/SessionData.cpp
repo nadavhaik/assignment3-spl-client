@@ -21,12 +21,10 @@ char *toBytesMessage(const vector<char> &v) {
 void fetchNotifications(SessionData *sd) {
     while(!sd->getShouldStop()) {
         if(sd->isLoggedIn()) {
-            FetchNotificationMessage *message = new FetchNotificationMessage();
-            ServerToClientMessage *response = sd->communicate(*message);
-            if(response->getType() == 9) {
+            FetchNotificationMessage message;
+            ServerToClientMessage *response = sd->communicate(message);
+            if(response->getType() == 9) // Only Notification-type responses will be printed
                 cout << response->toString() << endl;
-            }
-            delete message;
             delete response;
         }
         this_thread::sleep_for(chrono::milliseconds(FETCHING_INTERVAL));
