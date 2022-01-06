@@ -74,16 +74,40 @@ std::string ErrorMessage::toString() {
     return s;
 }
 
-AckMessage::AckMessage(const vector<char> &bytes, int originalMessageType)
-        :ServerToClientMessage(ACK, bytes){
+AckMessage::AckMessage(const vector<char> &bytes, int originalMessageType):
+        originalMessageType(originalMessageType),  ServerToClientMessage(ACK, bytes){
     decode();
 }
 
 void AckMessage::decode() {
     vector<char> notificationBytes = {bytes[2], bytes[3]};
     messageOP = Caster::byteVectorToShort(notificationBytes);
-    for(size_t i = 4; i < bytes.size()-1; i++)
-        content += bytes[i];
+    if(originalMessageType == LOGGED_IN_STATES || originalMessageType == STATISTICS) {
+        for(size_t i = 4; i < bytes.size()-1; i+=8) {
+            char ageBytes[] = {bytes[i], bytes[i+1]};
+            short age = Caster::bytesToShort(ageBytes);
+            char numOfPostsBytes[] = {bytes[i+2], bytes[i+3]};
+            short numOfPosts = Caster::bytesToShort(numOfPostsBytes);
+            char followersBytes[] = {bytes[i+4], bytes[i+5]};
+            short followers = Caster::bytesToShort(followersBytes);
+            char followingBytes[] = {bytes[i+6], bytes[i+7]};
+            short following = Caster::bytesToShort(followingBytes);
+
+            content += to_string(age);
+            content += " ";
+            content += to_string(numOfPosts);
+            content += " ";
+            content += to_string(followers);
+            content += " ";
+            content += to_string(following);
+            content += " ";
+        }
+        content = content.substr(0,content.size()-1);
+    } else {
+        for(size_t i = 4; i < bytes.size()-1; i++)
+            content += bytes[i];
+    }
+
 }
 
 std::string AckMessage::toString() {
