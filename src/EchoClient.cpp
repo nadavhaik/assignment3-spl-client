@@ -12,7 +12,7 @@ int main (int argc, char *argv[]) {
         SessionData s(host, port);
         s.run();
     } catch(connection_exception e) {
-        std::cerr << "Could not connect to host " << argv[0] << " in port " << argv[2] << std::endl << std::endl;
+        std::cerr << "Could not connect to host " << argv[1] << " in port " << argv[2] << std::endl << std::endl;
         return -1;
     }
 
