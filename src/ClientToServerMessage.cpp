@@ -127,7 +127,7 @@ PostMessage::PostMessage(const string &command) : ClientToServerMessage(POST) {
         content += result[i];
         content += " ";
     }
-    content = content.substr(0, content.size()-2);
+    content = content.substr(0, content.size()-1);
 }
 
 vector<char> PostMessage::encode() {
@@ -152,7 +152,7 @@ PMMessage::PMMessage(const string &command) : ClientToServerMessage(PRIVATE_MESS
         content += result[i];
         content += " ";
     }
-    content = content.substr(0, content.size()-2);
+    content = content.substr(0, content.size()-1);
 
     auto t = time(nullptr);
     auto tm = *localtime(&t);
