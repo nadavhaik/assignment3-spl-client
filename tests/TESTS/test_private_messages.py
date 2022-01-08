@@ -1,4 +1,5 @@
 from tests_functions import *
+from datetime import datetime
 
 build()
 client_nadav = RunningClient()
@@ -17,10 +18,10 @@ try:
 
     client_nadav.assert_command_returns("PM niv MA KORE?", "ERROR 6")
 
-    client_nadav.assert_command_returns("FOLLOW 0 niv", "ACK 4")
+    client_nadav.assert_command_returns("FOLLOW 0 niv", "ACK 4 niv")
     client_nadav.assert_command_returns("PM niv Trump your mom is Trump I Trump her in the Trump", "ACK 6")
     client_niv.assert_got_output("NOTIFICATION PM nadavh <filtered> your mom is <filtered> I <filtered> her in the "
-                                 "<filtered>")
+                                 "<filtered> " + datetime.today().strftime("%d-%m-%Y"))
 
 
 
