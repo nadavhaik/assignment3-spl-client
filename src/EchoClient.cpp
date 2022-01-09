@@ -1,4 +1,5 @@
 #include "../include/SessionData.h"
+#include <chrono>
 
 int main (int argc, char *argv[]) {
     if (argc < 3) {
@@ -16,8 +17,7 @@ int main (int argc, char *argv[]) {
         t1.join();
         if(t2.joinable())
             t2.join();
-
-        sleep(1);
+        this_thread::sleep_for(chrono::milliseconds(500));
 
     } catch(connection_exception &e) {
         std::cerr << "Could not connect to host " << argv[1] << " in port " << argv[2] << std::endl << std::endl;
