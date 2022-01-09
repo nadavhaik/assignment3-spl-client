@@ -17,7 +17,7 @@ int ClientToServerMessage::getType() {
 }
 
 RegisterMessage::RegisterMessage(const string &command)
-    : ClientToServerMessage(REGISTER) {
+    : ClientToServerMessage(REGISTER), username(), password(), birthday() {
     vector<string> result;
     split(result, command, boost::is_any_of(" "));
     if(result.size() != 4)
@@ -48,7 +48,7 @@ vector<char> RegisterMessage::encode() {
 RegisterMessage::~RegisterMessage()=default;
 
 LoginMessage::LoginMessage(const string &command)
-    : ClientToServerMessage(LOGIN) {
+    :ClientToServerMessage(LOGIN), username(), password(), captcha() {
     vector<string> result;
     split(result, command, boost::is_any_of(" "));
     if(result.size() != 4)
@@ -99,7 +99,7 @@ vector<char> LogoutMessage::encode() {
 LogoutMessage::~LogoutMessage()=default;
 
 FollowOrUnfollowMessage::FollowOrUnfollowMessage(const string &command)
-        : ClientToServerMessage(FOLLOW_OR_UNFOLLOW) {
+        :ClientToServerMessage(FOLLOW_OR_UNFOLLOW), follow(false), otherUserName() {
     vector<string> result;
     split(result, command, boost::is_any_of(" "));
     if(result.size() != 3)
@@ -126,7 +126,7 @@ vector<char> FollowOrUnfollowMessage::encode() {
 
 FollowOrUnfollowMessage::~FollowOrUnfollowMessage()=default;
 
-PostMessage::PostMessage(const string &command) : ClientToServerMessage(POST) {
+PostMessage::PostMessage(const string &command) :ClientToServerMessage(POST), content() {
     vector<string> result;
     split(result, command, boost::is_any_of(" "));
     if(result.size() < 2)
@@ -152,7 +152,8 @@ vector<char> PostMessage::encode() {
 PostMessage::~PostMessage()=default;
 
 
-PMMessage::PMMessage(const string &command) : ClientToServerMessage(PRIVATE_MESSAGE) {
+PMMessage::PMMessage(const string &command)
+        :ClientToServerMessage(PRIVATE_MESSAGE), otherUserName(), content(), sendingTimeAndDate() {
     vector<string> result;
     split(result, command, boost::is_any_of(" "));
     if(result.size() < 3)
@@ -205,7 +206,7 @@ vector<char> LoggedInStates::encode() {
 
 LoggedInStates::~LoggedInStates()=default;
 
-StatisticsMessage::StatisticsMessage(const string &command) : ClientToServerMessage(STATISTICS) {
+StatisticsMessage::StatisticsMessage(const string &command) : ClientToServerMessage(STATISTICS), usernames() {
     vector<string> result;
     split(result, command, boost::is_any_of(" "));
     if(result.size() != 2)
@@ -227,7 +228,7 @@ vector<char> StatisticsMessage::encode() {
 
 StatisticsMessage::~StatisticsMessage()=default;
 
-BlockMessage::BlockMessage(const string &command) : ClientToServerMessage(BLOCK) {
+BlockMessage::BlockMessage(const string &command) : ClientToServerMessage(BLOCK), otherUserName() {
     vector<string> result;
     split(result, command, boost::is_any_of(" "));
     if(result.size() != 2)

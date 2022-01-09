@@ -6,7 +6,8 @@
 #include "../include/Caster.h"
 
 
-ServerToClientMessage::ServerToClientMessage(stc_message_type type, vector<char> bytes): notificationType(type), bytes(bytes) {}
+ServerToClientMessage::ServerToClientMessage(stc_message_type type, vector<char> bytes)
+        :bytes(bytes), notificationType(type){}
 
 int ServerToClientMessage::getType() {
     return notificationType;
@@ -14,7 +15,7 @@ int ServerToClientMessage::getType() {
 
 
 NotificationMessage::NotificationMessage(const vector<char> &bytes)
-        : ServerToClientMessage(NOTIFICATION, bytes) {
+        : ServerToClientMessage(NOTIFICATION, bytes), n_type(), author(), content() {
     decode();
 }
 
@@ -61,7 +62,7 @@ std::string NotificationMessage::toString() {
 NotificationMessage::~NotificationMessage()=default;
 
 ErrorMessage::ErrorMessage(const vector<char> &bytes):
-        ServerToClientMessage(ERROR, bytes){
+        ServerToClientMessage(ERROR, bytes), messageOP(){
     decode();
 }
 
@@ -79,7 +80,7 @@ std::string ErrorMessage::toString() {
 ErrorMessage::~ErrorMessage()=default;
 
 AckMessage::AckMessage(const vector<char> &bytes, int originalMessageType):
-        originalMessageType(originalMessageType),  ServerToClientMessage(ACK, bytes){
+        ServerToClientMessage(ACK, bytes), messageOP(), content(), originalMessageType(originalMessageType)  {
     decode();
 }
 

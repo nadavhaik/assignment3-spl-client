@@ -22,8 +22,8 @@ public:
     void stop();
 private:
     ConnectionHandler ch;
-    bool loggedIn = false;
-    bool shouldStop = false;
+    bool loggedIn;
+    bool shouldStop;
     mutex connectionLock;
 };
 

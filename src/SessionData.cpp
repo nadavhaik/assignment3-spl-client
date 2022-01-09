@@ -37,7 +37,7 @@ void SessionData::fetchNotifications(shared_ptr<SessionData> sd) {
     }
 }
 
-SessionData::SessionData(string ip, short port): ch(ip, port) {
+SessionData::SessionData(string ip, short port): ch(ip, port), loggedIn(false), shouldStop(false), connectionLock() {
     if(!ch.connect())
         throw connection_exception();
 }

@@ -1,5 +1,8 @@
 cmake-build-debug/
 bin/
+tests/.idea/
+tests/__pycache__/
+tests/venv/
 .idea/.name
 .idea/assignment3-server.iml
 .idea/assignment3-spl-server.iml
