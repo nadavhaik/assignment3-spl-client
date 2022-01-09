@@ -2,12 +2,34 @@ import subprocess
 import os
 from time import sleep
 import json
+from enum import Enum
+import signal
+from pathlib import Path
 
 VALGRIND_LOG_FILE = './valgrind_log.txt'
 CPP_OUTPUT = "../../assignment3-spl-client"
 END_COMMAND = "LOGOUT"
-CONNECTION_DETAILS = "../connection_details.json"
+CONFIGURATION_FILE = "../configuration.json"
+if not Path(CONFIGURATION_FILE).is_file():
+    CONFIGURATION_FILE = "./configuration.json"
 EXPECTED_CLOSE_OUTPUT = "ACK 3"
+
+
+class Configurations:
+    __instance = None
+    def __init__(self):
+        if Configurations.__instance is not None:
+            raise ValueError()
+        with open(CONFIGURATION_FILE, 'r') as file:
+            data = json.load(file)
+        self.client_folder, self.server_folder, self.server_port, self.reactor_threads = \
+            (data["client_folder"], data["server_folder"], data["server_port"], data["reactor_threads"])
+
+    @staticmethod
+    def get_instance():
+        if Configurations.__instance is None:
+            Configurations.__instance = Configurations()
+        return Configurations.__instance
 
 
 def assert_equal(obj1, obj2):
@@ -19,32 +41,104 @@ def read_line_from_log(line_prefix: str, log: str):
     last_index = log.find('\n', first_index)
     return log[first_index:last_index]
 
-def build():
-    subprocess.run(["cmake", "./"], stdout=subprocess.PIPE, cwd="../..").stdout.decode('utf8').split('\n')
-    subprocess.run(["make"], stdout=subprocess.PIPE, cwd="../..").stdout.decode('utf8').split('\n')
 
-def start_client(host: str, port: int):
+def build_client():
+    print("Building Client...")
+    build_path = Configurations.get_instance().client_folder
+    subprocess.run(["cmake", "./"], stdout=subprocess.PIPE, cwd=build_path).stdout.decode('utf8').split('\n')
+    subprocess.run(["make"], stdout=subprocess.PIPE, cwd=build_path).stdout.decode('utf8').split('\n')
+    print("CLIENT BUILT")
+
+
+def build_server():
+    print("Building Server...")
+    build_path = Configurations.get_instance().server_folder
+    subprocess.run(["mvn", "clean", "package"], stdout=subprocess.PIPE, cwd=build_path).stdout.decode('utf8').split(
+        '\n')
+    print("SERVER BUILT")
+
+
+def build_all():
+    build_server()
+    build_client()
+
+
+def start_client():
+    host = RunningServer.get_instance().ip
+    port = RunningServer.get_instance().port
     subprocess.run(["make"], stdout=subprocess.PIPE, cwd="../..").stdout.decode('utf8').split('\n')
-    print(f"Running client")
     start_command = ["valgrind", "--leak-check=full", "--show-reachable=yes", f"--log-file={VALGRIND_LOG_FILE}",
                      CPP_OUTPUT, host, str(port)]
     p = subprocess.Popen(start_command, stdout=subprocess.PIPE, stdin=subprocess.PIPE)
     assert_equal(p.stdout.readline().decode(), f"Starting connect to {host}:{port}\n")
+    print("CLIENT STARTED")
     return p
 
 
-class RunningClient:
+class ServerArchitecture(Enum):
+    TPC = 0
+    REACTOR = 1
 
-    @staticmethod
-    def get_connection_details():
-        with open(CONNECTION_DETAILS, 'r') as file:
-            data = json.load(file)
 
-        return data["host"], data["port"]
+class RunningServer:
+    __instance = None
 
     def __init__(self):
-        host, port = self.get_connection_details()
-        self.process = start_client(host, port)
+        if RunningServer.__instance is not None:
+            raise ValueError()
+        self.server_folder = Configurations.get_instance().server_folder
+        self.port = Configurations.get_instance().server_port
+        self.threads = Configurations.get_instance().reactor_threads
+        self.process = None
+        self.ip = None
+
+    @staticmethod
+    def get_instance():
+        if RunningServer.__instance is None:
+            RunningServer.__instance = RunningServer()
+        return RunningServer.__instance
+
+    def start(self, architecture: ServerArchitecture):
+        print("Starting Server...")
+        server_folder = Configurations.get_instance().server_folder
+        main_class_path = "bgu.spl.net.impl.BGSServer"
+        main_class = main_class_path + ".TPCMain" if architecture == ServerArchitecture.TPC else main_class_path + ".ReactorMain"
+        arguments = f"{Configurations.get_instance().server_port}"
+        if architecture == ServerArchitecture.REACTOR:
+            arguments += f" {Configurations.get_instance().server_folder}"
+
+        self.process = subprocess.Popen(
+            ["mvn", "exec:java", f"-Dexec.mainClass={main_class}", f"-Dexec.args=\"{arguments}\""],
+            stdout=subprocess.PIPE, cwd=server_folder)
+
+        line = self.process.stdout.readline().decode()
+        while not line.startswith("SYSTEM IP:"):
+            line = self.process.stdout.readline().decode()
+        self.ip = line[11:-1]
+        print(f"SERVER IS UP ON IP: {self.ip}")
+
+    def stop(self):
+        os.killpg(os.getpgid(self.process.pid), signal.SIGTERM)
+        self.process = None
+        self.ip = None
+
+    @staticmethod
+    def get_configurations():
+        with open(CONFIGURATION_FILE, 'r') as file:
+            data = json.load(file)
+        return data["server_folder"], data["port"], data["reactor_threads"]
+
+
+class RunningClient:
+    @staticmethod
+    def get_connection_details():
+        with open(CONFIGURATION_FILE, 'r') as file:
+            data = json.load(file)
+
+        return data["host"], data["port"], data["reactor_thread"]
+
+    def __init__(self):
+        self.process = start_client()
 
     def assert_command_returns(self, command: str, expected_output: str):
         expected_output_lines = 0 if expected_output == "" else expected_output.count("\n") + 1
@@ -74,7 +168,6 @@ class RunningClient:
 
     def close_client(self):
         out, err = self.process.communicate(END_COMMAND.encode())
-        os.remove(CPP_OUTPUT)
         assert_equal(out.decode(), EXPECTED_CLOSE_OUTPUT + "\n")
         sleep(2)
         with open(VALGRIND_LOG_FILE, 'r', encoding='utf8') as log_file:

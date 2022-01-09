@@ -1,0 +1,6 @@
+{
+  "server_port": 9400,
+  "server_folder": "/mnt/n/Users/Nadav/IdeaProjects/assignment3-spl-server",
+  "client_folder": "/mnt/c/Users/Nadav/CLionProjects/assignment3-spl-client",
+  "reactor_threads": 1
+}
