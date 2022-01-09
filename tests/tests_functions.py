@@ -178,12 +178,9 @@ class RunningClient:
         definitely_lost_line = read_line_from_log("definitely lost", valgrind_log)
         possibly_lost_line = read_line_from_log("possibly lost", valgrind_log)
 
-        if definitely_lost_line != "":
-            assert_equal(definitely_lost_line, "definitely lost: 0 bytes in 0 blocks")
-        if possibly_lost_line != "":
-            assert_equal(possibly_lost_line, "possibly lost: 0 bytes in 0 blocks")
-
-        if valgrind_log.find("All heap blocks were freed -- no leaks are possible") == -1:
-            raise AssertionError("The good line wasn't found in valgrind's log!!!")
+        if definitely_lost_line != "" and definitely_lost_line != "definitely lost: 0 bytes in 0 blocks":
+            raise AssertionError(f"A memory leak was found - read log in {self.valgrind_log}")
+        if possibly_lost_line != "" and possibly_lost_line != "possibly lost: 0 bytes in 0 blocks":
+            raise AssertionError(f"A memory leak was found - read log in {self.valgrind_log}")
 
         os.remove(self.valgrind_log)
