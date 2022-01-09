@@ -1,12 +1,12 @@
 import subprocess
 import os
+import uuid
 from time import sleep
 import json
 from enum import Enum
 import signal
 from pathlib import Path
 
-VALGRIND_LOG_FILE = './valgrind_log.txt'
 CPP_OUTPUT = "../../assignment3-spl-client"
 END_COMMAND = "LOGOUT"
 CONFIGURATION_FILE = "../configuration.json"
@@ -63,11 +63,11 @@ def build_all():
     build_client()
 
 
-def start_client():
+def start_client(valgrind_log: str):
     host = RunningServer.get_instance().ip
     port = RunningServer.get_instance().port
     subprocess.run(["make"], stdout=subprocess.PIPE, cwd="../..").stdout.decode('utf8').split('\n')
-    start_command = ["valgrind", "--leak-check=full", "--show-reachable=yes", f"--log-file={VALGRIND_LOG_FILE}",
+    start_command = ["valgrind", "--leak-check=full", "--show-reachable=yes", f"--log-file={valgrind_log}",
                      CPP_OUTPUT, host, str(port)]
     p = subprocess.Popen(start_command, stdout=subprocess.PIPE, stdin=subprocess.PIPE)
     assert_equal(p.stdout.readline().decode(), f"Starting connect to {host}:{port}\n")
@@ -99,13 +99,13 @@ class RunningServer:
         return RunningServer.__instance
 
     def start(self, architecture: ServerArchitecture):
-        print("Starting Server...")
+        print(f"Starting Server in architecture: {architecture.name}")
         server_folder = Configurations.get_instance().server_folder
         main_class_path = "bgu.spl.net.impl.BGSServer"
         main_class = main_class_path + ".TPCMain" if architecture == ServerArchitecture.TPC else main_class_path + ".ReactorMain"
         arguments = f"{Configurations.get_instance().server_port}"
         if architecture == ServerArchitecture.REACTOR:
-            arguments += f" {Configurations.get_instance().server_folder}"
+            arguments += f",{Configurations.get_instance().reactor_threads}"
 
         self.process = subprocess.Popen(
             ["mvn", "exec:java", f"-Dexec.mainClass={main_class}", f"-Dexec.args=\"{arguments}\""],
@@ -118,9 +118,10 @@ class RunningServer:
         print(f"SERVER IS UP ON IP: {self.ip}")
 
     def stop(self):
-        os.killpg(os.getpgid(self.process.pid), signal.SIGTERM)
+        self.process.kill()
         self.process = None
         self.ip = None
+        print("Server closed - test ended in current architecture\n")
 
     @staticmethod
     def get_configurations():
@@ -138,7 +139,8 @@ class RunningClient:
         return data["host"], data["port"], data["reactor_thread"]
 
     def __init__(self):
-        self.process = start_client()
+        self.valgrind_log = f"valgrind_{uuid.uuid4()}.txt"
+        self.process = start_client(self.valgrind_log)
 
     def assert_command_returns(self, command: str, expected_output: str):
         expected_output_lines = 0 if expected_output == "" else expected_output.count("\n") + 1
@@ -170,7 +172,7 @@ class RunningClient:
         out, err = self.process.communicate(END_COMMAND.encode())
         assert_equal(out.decode(), EXPECTED_CLOSE_OUTPUT + "\n")
         sleep(2)
-        with open(VALGRIND_LOG_FILE, 'r', encoding='utf8') as log_file:
+        with open(self.valgrind_log, 'r', encoding='utf8') as log_file:
             valgrind_log = log_file.read()
 
         definitely_lost_line = read_line_from_log("definitely lost", valgrind_log)
@@ -184,5 +186,4 @@ class RunningClient:
         if valgrind_log.find("All heap blocks were freed -- no leaks are possible") == -1:
             raise AssertionError("The good line wasn't found in valgrind's log!!!")
 
-        os.remove(VALGRIND_LOG_FILE)
-        print("Test ended!\n")
+        os.remove(self.valgrind_log)
