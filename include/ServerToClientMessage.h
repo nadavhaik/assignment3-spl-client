@@ -20,7 +20,7 @@ enum notification_type {
 class ServerToClientMessage {
 public:
     explicit ServerToClientMessage(stc_message_type type, vector<char> bytes);
-    ~ServerToClientMessage()=default;
+    virtual ~ServerToClientMessage() {};
     virtual std::string toString()=0;
     int getType();
 protected:
@@ -31,6 +31,7 @@ protected:
 class NotificationMessage : public ServerToClientMessage {
 public:
     explicit NotificationMessage(const vector<char> &bytes);
+    ~NotificationMessage();
     void decode();
     std::string toString() override;
 private:
@@ -42,6 +43,7 @@ private:
 class AckMessage : public ServerToClientMessage {
 public:
     explicit AckMessage(const vector<char> &bytes, int originalMessageType);
+    ~AckMessage();
     void decode();
     std::string toString() override;
 private:
@@ -53,6 +55,7 @@ private:
 class ErrorMessage : public ServerToClientMessage {
 public:
     explicit ErrorMessage(const vector<char> &bytes);
+    ~ErrorMessage();
     void decode();
     std::string toString() override;
 private:

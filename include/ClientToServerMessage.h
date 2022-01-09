@@ -23,7 +23,7 @@ enum cts_message_type {
 class ClientToServerMessage{
 public:
     ClientToServerMessage(cts_message_type type);
-    ~ClientToServerMessage()=default;
+    virtual ~ClientToServerMessage(){};
     virtual vector<char> encode()=0;
     int getType();
 private:
@@ -33,6 +33,7 @@ private:
 class RegisterMessage : public ClientToServerMessage {
 public:
     explicit RegisterMessage(const string &command);
+    ~RegisterMessage();
     vector<char> encode() override;
 private:
     string username;
@@ -43,6 +44,7 @@ private:
 class LoginMessage : public ClientToServerMessage {
 public:
     explicit LoginMessage(const string &command);
+    ~LoginMessage();
     vector<char> encode() override;
 private:
     string username;
@@ -53,12 +55,14 @@ private:
 class LogoutMessage : public ClientToServerMessage {
 public:
     explicit LogoutMessage(const string &command);
+    ~LogoutMessage();
     vector<char> encode() override;
 };
 
 class FollowOrUnfollowMessage : public ClientToServerMessage {
 public:
     explicit FollowOrUnfollowMessage(const string &command);
+    ~FollowOrUnfollowMessage();
     vector<char> encode() override;
 private:
     bool follow;
@@ -68,6 +72,7 @@ private:
 class PostMessage : public ClientToServerMessage {
 public:
     explicit PostMessage(const string &command);
+    ~PostMessage();
     vector<char> encode() override;
 private:
     string content;
@@ -77,6 +82,7 @@ private:
 class PMMessage : public ClientToServerMessage {
 public:
     explicit PMMessage(const string &command);
+    ~PMMessage();
     vector<char> encode() override;
 private:
     string otherUserName;
@@ -87,12 +93,14 @@ private:
 class LoggedInStates : public ClientToServerMessage {
 public:
     explicit LoggedInStates(const string &command);
+    ~LoggedInStates();
     vector<char> encode() override;
 };
 
 class StatisticsMessage : public ClientToServerMessage {
 public:
     explicit StatisticsMessage(const string &command);
+    ~StatisticsMessage();
     vector<char> encode() override;
 private:
     string usernames;
@@ -101,6 +109,7 @@ private:
 class BlockMessage : public ClientToServerMessage {
 public:
     explicit BlockMessage(const string &command);
+    ~BlockMessage();
     vector<char> encode() override;
 private:
     string otherUserName;
@@ -109,6 +118,7 @@ private:
 class FetchNotificationMessage : public ClientToServerMessage {
 public:
     explicit FetchNotificationMessage();
+    ~FetchNotificationMessage();
     vector<char> encode() override;
 };
 

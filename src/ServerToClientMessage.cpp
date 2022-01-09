@@ -58,6 +58,8 @@ std::string NotificationMessage::toString() {
 
 }
 
+NotificationMessage::~NotificationMessage()=default;
+
 ErrorMessage::ErrorMessage(const vector<char> &bytes):
         ServerToClientMessage(ERROR, bytes){
     decode();
@@ -73,6 +75,8 @@ std::string ErrorMessage::toString() {
     s += to_string(messageOP);
     return s;
 }
+
+ErrorMessage::~ErrorMessage()=default;
 
 AckMessage::AckMessage(const vector<char> &bytes, int originalMessageType):
         originalMessageType(originalMessageType),  ServerToClientMessage(ACK, bytes){
@@ -120,3 +124,5 @@ std::string AckMessage::toString() {
 
     return s;
 }
+
+AckMessage::~AckMessage()=default;

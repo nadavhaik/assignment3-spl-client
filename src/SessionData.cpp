@@ -18,7 +18,7 @@ char *toBytesMessage(const vector<char> &v) {
     return c;
 }
 
-void fetchNotifications(SessionData *sd) {
+void SessionData::fetchNotifications(shared_ptr<SessionData> sd) {
     while(!sd->getShouldStop()) {
         if(sd->isLoggedIn()) {
             FetchNotificationMessage message;
@@ -52,10 +52,9 @@ bool SessionData::getShouldStop() {
 }
 
 
-void SessionData::run() {
-    std::thread t(fetchNotifications, this);
-    t.detach();
-    while(!shouldStop) {
+void SessionData::run(shared_ptr<SessionData> sd) {
+
+    while(!sd->getShouldStop()) {
         string input_command;
         getline(cin, input_command);
         ClientToServerMessage *message;
@@ -87,7 +86,7 @@ void SessionData::run() {
 
         ServerToClientMessage *response;
         try {
-            response = communicate(*message);
+            response = sd->communicate(*message);
         } catch(communication_exception &e) {
             cout << "Could not communicate!" << endl;
             delete message;
@@ -95,16 +94,14 @@ void SessionData::run() {
         }
         cout << response->toString() << endl;
         if(message->getType() == 2 && response->getType() == 10) // LOGIN + ACK
-            loggedIn = true;
+            sd->loggedIn = true;
         if(message->getType() == 3 && response->getType() == 10) { // LOGOUT + ACK
-            loggedIn = false;
-            this->stop();
+            sd->loggedIn = false;
+            sd->stop();
         }
         delete message;
         delete response;
     }
-    if(t.joinable()) // else it died before
-        t.join();
 
 }
 
@@ -148,7 +145,7 @@ ServerToClientMessage *SessionData::communicate(ClientToServerMessage &message) 
             break;
     }
 
-    delete bytes;
+    delete[] bytes;
     return responseMessage;
 
 }
@@ -156,6 +153,7 @@ ServerToClientMessage *SessionData::communicate(ClientToServerMessage &message) 
 void SessionData::stop() {
     shouldStop = true;
 }
+
 
 
 

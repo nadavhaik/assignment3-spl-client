@@ -9,9 +9,17 @@ int main (int argc, char *argv[]) {
     std::string host = argv[1];
     short port = atoi(argv[2]);
     try {
-        SessionData s(host, port);
-        s.run();
-    } catch(connection_exception e) {
+        shared_ptr<SessionData> s = make_shared<SessionData>(host, port);
+        std::thread t1(SessionData::run, s);
+        std::thread t2(SessionData::fetchNotifications, s);
+        t2.detach();
+        t1.join();
+        if(t2.joinable())
+            t2.join();
+
+        sleep(1);
+
+    } catch(connection_exception &e) {
         std::cerr << "Could not connect to host " << argv[1] << " in port " << argv[2] << std::endl << std::endl;
         return -1;
     }

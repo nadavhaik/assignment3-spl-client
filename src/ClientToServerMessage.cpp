@@ -45,6 +45,8 @@ vector<char> RegisterMessage::encode() {
     return encodedCommand;
 }
 
+RegisterMessage::~RegisterMessage()=default;
+
 LoginMessage::LoginMessage(const string &command)
     : ClientToServerMessage(LOGIN) {
     vector<string> result;
@@ -78,6 +80,8 @@ vector<char> LoginMessage::encode() {
     return encodedCommand;
 }
 
+LoginMessage::~LoginMessage()=default;
+
 LogoutMessage::LogoutMessage(const string &command)
     : ClientToServerMessage(LOGOUT) {
     if(command != "LOGOUT")
@@ -91,6 +95,8 @@ vector<char> LogoutMessage::encode() {
     encodedCommand.push_back(opCode[1]);
     return encodedCommand;
 }
+
+LogoutMessage::~LogoutMessage()=default;
 
 FollowOrUnfollowMessage::FollowOrUnfollowMessage(const string &command)
         : ClientToServerMessage(FOLLOW_OR_UNFOLLOW) {
@@ -118,6 +124,8 @@ vector<char> FollowOrUnfollowMessage::encode() {
     return encodedCommand;
 }
 
+FollowOrUnfollowMessage::~FollowOrUnfollowMessage()=default;
+
 PostMessage::PostMessage(const string &command) : ClientToServerMessage(POST) {
     vector<string> result;
     split(result, command, boost::is_any_of(" "));
@@ -141,6 +149,8 @@ vector<char> PostMessage::encode() {
     return encodedCommand;
 }
 
+PostMessage::~PostMessage()=default;
+
 
 PMMessage::PMMessage(const string &command) : ClientToServerMessage(PRIVATE_MESSAGE) {
     vector<string> result;
@@ -155,10 +165,11 @@ PMMessage::PMMessage(const string &command) : ClientToServerMessage(PRIVATE_MESS
     content = content.substr(0, content.size()-1);
 
     auto t = time(nullptr);
-    auto tm = *localtime(&t);
+    auto *tm = localtime(&t);
     std::ostringstream oss;
-    oss << std::put_time(&tm, "%d-%m-%Y %H:%M");
+    oss << std::put_time(tm, "%d-%m-%Y %H:%M");
     sendingTimeAndDate = oss.str();
+    delete tm;
 }
 
 vector<char> PMMessage::encode() {
@@ -179,6 +190,8 @@ vector<char> PMMessage::encode() {
     return encodedCommand;
 }
 
+PMMessage::~PMMessage()=default;
+
 LoggedInStates::LoggedInStates(const string &command): ClientToServerMessage(LOGGED_IN_STATES) {}
 
 vector<char> LoggedInStates::encode() {
@@ -189,6 +202,8 @@ vector<char> LoggedInStates::encode() {
 
     return encodedCommand;
 }
+
+LoggedInStates::~LoggedInStates()=default;
 
 StatisticsMessage::StatisticsMessage(const string &command) : ClientToServerMessage(STATISTICS) {
     vector<string> result;
@@ -210,6 +225,8 @@ vector<char> StatisticsMessage::encode() {
     return encodedCommand;
 }
 
+StatisticsMessage::~StatisticsMessage()=default;
+
 BlockMessage::BlockMessage(const string &command) : ClientToServerMessage(BLOCK) {
     vector<string> result;
     split(result, command, boost::is_any_of(" "));
@@ -230,6 +247,8 @@ vector<char> BlockMessage::encode() {
     return encodedCommand;
 }
 
+BlockMessage::~BlockMessage()=default;
+
 FetchNotificationMessage::FetchNotificationMessage() : ClientToServerMessage(FETCH_NOTIFICATION) {}
 
 vector<char> FetchNotificationMessage::encode() {
@@ -240,4 +259,6 @@ vector<char> FetchNotificationMessage::encode() {
 
     return encodedCommand;
 }
+
+FetchNotificationMessage::~FetchNotificationMessage()=default;
 

@@ -14,7 +14,8 @@ class SessionData {
 public:
     SessionData(string ip, short port);
     ~SessionData();
-    void run();
+    static void run(shared_ptr<SessionData> sd);
+    static void fetchNotifications(shared_ptr<SessionData> sd);
     ServerToClientMessage *communicate(ClientToServerMessage &message);
     bool isLoggedIn();
     bool getShouldStop();
