@@ -4,7 +4,6 @@ import uuid
 from time import sleep
 import json
 from enum import Enum
-import signal
 from pathlib import Path
 
 CPP_OUTPUT = "../../assignment3-spl-client"
@@ -44,6 +43,7 @@ def read_line_from_log(line_prefix: str, log: str):
 
 def build_client():
     print("Building Client...")
+    os.remove(f"{Configurations.get_instance().client_folder}/Makefile")
     build_path = Configurations.get_instance().client_folder
     subprocess.run(["cmake", "./"], stdout=subprocess.PIPE, cwd=build_path).stdout.decode('utf8').split('\n')
     subprocess.run(["make"], stdout=subprocess.PIPE, cwd=build_path).stdout.decode('utf8').split('\n')
