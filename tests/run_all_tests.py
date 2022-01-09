@@ -1,5 +1,3 @@
-import traceback
-
 from tests_functions import *
 from os import walk
 import subprocess
