@@ -2,7 +2,7 @@ CFLAGS:=-c -Wall -Weffc++ -g -std=c++11 -Iinclude
 LDFLAGS:=-lboost_system -lboost_thread -pthread
 
 all: EchoClient
-	g++ -o bin/BGSClient bin/EchoClient.o bin/ConnectionHandler.o bin/SessionData.o bin/Caster.o bin/ClientToServerMessage.o bin/ServerToClientMessage.o $(LDFLAGS)
+	g++ -o bin/BGSclient bin/EchoClient.o bin/ConnectionHandler.o bin/SessionData.o bin/Caster.o bin/ClientToServerMessage.o bin/ServerToClientMessage.o $(LDFLAGS)
 
 EchoClient: bin/ConnectionHandler.o bin/ClientToServerMessage.o bin/ServerToClientMessage.o bin/EchoClient.o bin/SessionData.o bin/Caster.o
 
