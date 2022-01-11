@@ -4,13 +4,10 @@ import uuid
 from time import sleep
 import json
 from enum import Enum
-from pathlib import Path
 
-CPP_OUTPUT = "../../assignment3-spl-client"
+CPP_OUTPUT = "./bin/BGSclient"
 END_COMMAND = "LOGOUT"
-CONFIGURATION_FILE = "../configuration.json"
-if not Path(CONFIGURATION_FILE).is_file():
-    CONFIGURATION_FILE = "./configuration.json"
+CONFIGURATION_FILE = "./configuration.json"
 EXPECTED_CLOSE_OUTPUT = "ACK 3"
 
 
@@ -21,8 +18,11 @@ class Configurations:
             raise ValueError()
         with open(CONFIGURATION_FILE, 'r') as file:
             data = json.load(file)
-        self.client_folder, self.server_folder, self.server_port, self.reactor_threads = \
-            (data["client_folder"], data["server_folder"], data["server_port"], data["reactor_threads"])
+        self.client_folder = data["client_folder"]
+        self.server_folder = data["server_folder"]
+        self.server_port = data["server_port"]
+        self.reactor_threads = data["reactor_threads"]
+        self.valgrind_logs_folder = data["valgrind_logs_folder"]
 
     @staticmethod
     def get_instance():
@@ -43,9 +43,7 @@ def read_line_from_log(line_prefix: str, log: str):
 
 def build_client():
     print("Building Client...")
-    os.remove(f"{Configurations.get_instance().client_folder}/Makefile")
     build_path = Configurations.get_instance().client_folder
-    subprocess.run(["cmake", "./"], stdout=subprocess.PIPE, cwd=build_path).stdout.decode('utf8').split('\n')
     subprocess.run(["make"], stdout=subprocess.PIPE, cwd=build_path).stdout.decode('utf8').split('\n')
     print("CLIENT BUILT")
 
@@ -66,10 +64,10 @@ def build_all():
 def start_client(valgrind_log: str):
     host = RunningServer.get_instance().ip
     port = RunningServer.get_instance().port
-    subprocess.run(["make"], stdout=subprocess.PIPE, cwd="../..").stdout.decode('utf8').split('\n')
+    subprocess.run(["make"], stdout=subprocess.PIPE, cwd=Configurations.get_instance().client_folder).stdout.decode('utf8').split('\n')
     start_command = ["valgrind", "--leak-check=full", "--show-reachable=yes", f"--log-file={valgrind_log}",
                      CPP_OUTPUT, host, str(port)]
-    p = subprocess.Popen(start_command, stdout=subprocess.PIPE, stdin=subprocess.PIPE)
+    p = subprocess.Popen(start_command, stdout=subprocess.PIPE, stdin=subprocess.PIPE, cwd=Configurations.get_instance().client_folder)
     assert_equal(p.stdout.readline().decode(), f"Starting connect to {host}:{port}\n")
     print("CLIENT STARTED")
     return p
@@ -139,7 +137,7 @@ class RunningClient:
         return data["host"], data["port"], data["reactor_thread"]
 
     def __init__(self):
-        self.valgrind_log = f"valgrind_{uuid.uuid4()}.txt"
+        self.valgrind_log = f"{Configurations.get_instance().valgrind_logs_folder}/valgrind_{uuid.uuid4()}.txt"
         self.process = start_client(self.valgrind_log)
 
     def assert_command_returns(self, command: str, expected_output: str):
