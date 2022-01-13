@@ -13,6 +13,7 @@ EXPECTED_CLOSE_OUTPUT = "ACK 3"
 
 class Configurations:
     __instance = None
+
     def __init__(self):
         if Configurations.__instance is not None:
             raise ValueError()
@@ -29,6 +30,7 @@ class Configurations:
         if Configurations.__instance is None:
             Configurations.__instance = Configurations()
         return Configurations.__instance
+
 
 
 def assert_equal(obj1, obj2):
@@ -61,13 +63,18 @@ def build_all():
     build_client()
 
 
-def start_client(valgrind_log: str):
+def start_client(valgrind_log: str = None):
     host = RunningServer.get_instance().ip
     port = RunningServer.get_instance().port
-    subprocess.run(["make"], stdout=subprocess.PIPE, cwd=Configurations.get_instance().client_folder).stdout.decode('utf8').split('\n')
-    start_command = ["valgrind", "--leak-check=full", "--show-reachable=yes", f"--log-file={valgrind_log}",
+    subprocess.run(["make"], stdout=subprocess.PIPE, cwd=Configurations.get_instance().client_folder).stdout.decode(
+        'utf8').split('\n')
+    if valgrind_log is None:
+        start_command = [CPP_OUTPUT, host, str(port)]
+    else:
+        start_command = ["valgrind", "--leak-check=full", "--show-reachable=yes", f"--log-file={valgrind_log}",
                      CPP_OUTPUT, host, str(port)]
-    p = subprocess.Popen(start_command, stdout=subprocess.PIPE, stdin=subprocess.PIPE, cwd=Configurations.get_instance().client_folder)
+    p = subprocess.Popen(start_command, stdout=subprocess.PIPE, stdin=subprocess.PIPE,
+                         cwd=Configurations.get_instance().client_folder)
     assert_equal(p.stdout.readline().decode(), f"Starting connect to {host}:{port}\n")
     print("CLIENT STARTED")
     return p
@@ -129,16 +136,13 @@ class RunningServer:
 
 
 class RunningClient:
-    @staticmethod
-    def get_connection_details():
-        with open(CONFIGURATION_FILE, 'r') as file:
-            data = json.load(file)
-
-        return data["host"], data["port"], data["reactor_thread"]
-
-    def __init__(self):
-        self.valgrind_log = f"{Configurations.get_instance().valgrind_logs_folder}/valgrind_{uuid.uuid4()}.txt"
-        self.process = start_client(self.valgrind_log)
+    def __init__(self, valgrind_mode=False):
+        self.valgrind_mode = valgrind_mode
+        if valgrind_mode:
+            self.valgrind_log = f"{Configurations.get_instance().valgrind_logs_folder}/valgrind_{uuid.uuid4()}.txt"
+            self.process = start_client(self.valgrind_log)
+        else:
+            self.process = start_client()
 
     def assert_command_returns(self, command: str, expected_output: str):
         expected_output_lines = 0 if expected_output == "" else expected_output.count("\n") + 1
@@ -169,16 +173,17 @@ class RunningClient:
     def close_client(self):
         out, err = self.process.communicate(END_COMMAND.encode())
         assert_equal(out.decode(), EXPECTED_CLOSE_OUTPUT + "\n")
-        sleep(2)
-        with open(self.valgrind_log, 'r', encoding='utf8') as log_file:
-            valgrind_log = log_file.read()
+        if self.valgrind_mode:
+            sleep(2)
+            with open(self.valgrind_log, 'r', encoding='utf8') as log_file:
+                valgrind_log = log_file.read()
 
-        definitely_lost_line = read_line_from_log("definitely lost", valgrind_log)
-        possibly_lost_line = read_line_from_log("possibly lost", valgrind_log)
+            definitely_lost_line = read_line_from_log("definitely lost", valgrind_log)
+            possibly_lost_line = read_line_from_log("possibly lost", valgrind_log)
 
-        if definitely_lost_line != "" and definitely_lost_line != "definitely lost: 0 bytes in 0 blocks":
-            raise AssertionError(f"A memory leak was found - read log in {self.valgrind_log}")
-        if possibly_lost_line != "" and possibly_lost_line != "possibly lost: 0 bytes in 0 blocks":
-            raise AssertionError(f"A memory leak was found - read log in {self.valgrind_log}")
+            if definitely_lost_line != "" and definitely_lost_line != "definitely lost: 0 bytes in 0 blocks":
+                raise AssertionError(f"A memory leak was found - read log in {self.valgrind_log}")
+            if possibly_lost_line != "" and possibly_lost_line != "possibly lost: 0 bytes in 0 blocks":
+                raise AssertionError(f"A memory leak was found - read log in {self.valgrind_log}")
 
-        os.remove(self.valgrind_log)
+            os.remove(self.valgrind_log)
